@@ -223,9 +223,10 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa -p "${{ secrets.EC2_PORT || '22' }}" "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}" <<'EOF'
           set -e
-          cd "${{ vars.EC2_APP_DIR || '/home/ubuntu/wanderlust' }}"
+          APP_DIR="/home/${{ secrets.EC2_USERNAME }}/wanderlust"
+          mkdir -p "$APP_DIR"
+          cd "$APP_DIR"
           export IMAGE_TAG=${IMAGE_TAG}
-          # Use production override compose which references images with ${IMAGE_TAG}
           sudo docker compose -f docker-compose.yml pull || true
           sudo docker compose -f docker-compose.yml up -d --no-build
           echo "Deployment finished: ${IMAGE_TAG}"
