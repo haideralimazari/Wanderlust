@@ -183,8 +183,8 @@ jobs:
           projectBaseDir: .
           args: >
             -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.organization=wanderlust
-            -Dsonar.projectKey=wanderlust
+            -Dsonar.organization=Haider Ali Mazari
+            -Dsonar.projectKey=haideralimazari
             -Dsonar.sources=backend,frontend
             -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/package-lock.json
 
