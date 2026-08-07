@@ -1,0 +1,48 @@
+name: Deploy to EC2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-ec2-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install SSH client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openssh-client rsync
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Copy project to EC2
+        run: |
+          rsync -avz --delete -e "ssh -i ~/.ssh/id_rsa -p ${{ secrets.EC2_PORT || '22' }}" \
+            --exclude '.git' \
+            --exclude 'node_modules' \
+            . "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${{ vars.EC2_APP_DIR || '/home/ubuntu/wanderlust' }}/"
+
+      - name: Restart app on EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa -p "${{ secrets.EC2_PORT || '22' }}" "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}" 'bash -s' <<'EOF'
+          set -e
+          cd "${{ vars.EC2_APP_DIR || '/home/ubuntu/wanderlust' }}"
+          sudo docker compose down || true
+          sudo docker compose up -d --build
+          echo "Deployment complete"
+          EOF
