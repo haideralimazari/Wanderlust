@@ -217,16 +217,24 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
 
+      - name: Copy deploy files to EC2
+        run: |
+          APP_DIR="/home/${{ secrets.EC2_USERNAME }}/wanderlust"
+          ssh -i ~/.ssh/id_rsa -p "${{ secrets.EC2_PORT || '22' }}" "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}" "mkdir -p '${APP_DIR}' '${APP_DIR}/backend' '${APP_DIR}/frontend' '${APP_DIR}/nginx' '${APP_DIR}/backend/data'"
+          scp -i ~/.ssh/id_rsa -P "${{ secrets.EC2_PORT || '22' }}" docker-compose.yml "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${APP_DIR}/"
+          scp -i ~/.ssh/id_rsa -P "${{ secrets.EC2_PORT || '22' }}" backend/.env.docker "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${APP_DIR}/backend/.env.docker"
+          scp -i ~/.ssh/id_rsa -P "${{ secrets.EC2_PORT || '22' }}" frontend/.env.docker "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${APP_DIR}/frontend/.env.docker"
+          scp -i ~/.ssh/id_rsa -P "${{ secrets.EC2_PORT || '22' }}" nginx/default.conf "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${APP_DIR}/nginx/default.conf"
+
       - name: Start/update services on EC2 (pull images from Docker Hub)
         env:
           IMAGE_TAG: ${{ needs.build_and_push.outputs.image_tag }}
         run: |
-          ssh -i ~/.ssh/id_rsa -p "${{ secrets.EC2_PORT || '22' }}" "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}" <<'EOF'
+          ssh -i ~/.ssh/id_rsa -p "${{ secrets.EC2_PORT || '22' }}" "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}" <<EOF
           set -e
           APP_DIR="/home/${{ secrets.EC2_USERNAME }}/wanderlust"
-          mkdir -p "$APP_DIR"
           cd "$APP_DIR"
-          export IMAGE_TAG=${IMAGE_TAG}
+          export IMAGE_TAG="${IMAGE_TAG}"
           sudo docker compose -f docker-compose.yml pull || true
           sudo docker compose -f docker-compose.yml up -d --no-build
           echo "Deployment finished: ${IMAGE_TAG}"
