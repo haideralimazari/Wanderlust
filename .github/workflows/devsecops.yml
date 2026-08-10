@@ -224,7 +224,7 @@ jobs:
           ssh -i ~/.ssh/id_rsa -p "${{ secrets.EC2_PORT || '22' }}" "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}" "mkdir -p '${APP_DIR}' '${APP_DIR}/backend' '${APP_DIR}/frontend' '${APP_DIR}/nginx' '${APP_DIR}/backend/data'"
           scp -i ~/.ssh/id_rsa -P "${{ secrets.EC2_PORT || '22' }}" docker-compose.yml "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${APP_DIR}/"
           scp -i ~/.ssh/id_rsa -P "${{ secrets.EC2_PORT || '22' }}" backend/.env.docker "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${APP_DIR}/backend/.env.docker"
-          scp -i ~/.ssh/id_rsa -P "${{ secrets.EC2_PORT || '22' }}" frontend/.env.sample "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${APP_DIR}/frontend/.env.sample"
+          scp -i ~/.ssh/id_rsa -P "${{ secrets.EC2_PORT || '22' }}" frontend/.env.docker "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${APP_DIR}/frontend/.env.docker"
           scp -i ~/.ssh/id_rsa -P "${{ secrets.EC2_PORT || '22' }}" nginx/default.conf "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${APP_DIR}/nginx/default.conf"
 
       - name: Deploy via SSH
