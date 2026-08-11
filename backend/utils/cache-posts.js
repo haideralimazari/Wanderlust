@@ -3,7 +3,7 @@ import { REDIS_PREFIX } from './constants.js';
 
 // Helper function to check if Redis is available
 function isRedisEnabled() {
-  return getRedisClient() !== null;
+  return Boolean(getRedisClient());
 }
 
 export async function retrieveDataFromCache(key) {
