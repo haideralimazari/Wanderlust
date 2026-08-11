@@ -13,11 +13,6 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Use the production env if available, otherwise fallback to sample
-RUN if [ -f .env.docker ]; then cp .env.docker .env.local; else cp .env.sample .env.local; fi
-
-RUN npm run build
-
 # ------------------- Stage 2: Final Stage ------------------------------
 FROM node:21-slim
 
@@ -26,6 +21,9 @@ WORKDIR /app
 
 # Copy built assets and dependencies from frontend-builder stage
 COPY --from=frontend-builder /app .
+
+# Copy the .env.docker file to .env.local
+COPY .env.docker .env.local
 
 # Expose port 5173 for the Node.js application
 EXPOSE 5173
