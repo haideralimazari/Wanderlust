@@ -221,23 +221,31 @@ jobs:
       - name: Copy deploy files to EC2
         run: |
           APP_DIR="/home/${{ secrets.EC2_USERNAME }}/wanderlust"
-          ssh -i ~/.ssh/id_rsa -p "${{ secrets.EC2_PORT || '22' }}" "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}" "rm -rf '${APP_DIR}' && mkdir -p '${APP_DIR}'"
-          scp -i ~/.ssh/id_rsa -P "${{ secrets.EC2_PORT || '22' }}" -r docker-compose.yml backend frontend nginx "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${APP_DIR}/"
+          ssh -i ~/.ssh/id_rsa -p "${{ secrets.EC2_PORT || '22' }}" "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}" "mkdir -p '${APP_DIR}' '${APP_DIR}/backend' '${APP_DIR}/frontend' '${APP_DIR}/nginx' '${APP_DIR}/backend/data'"
+          scp -i ~/.ssh/id_rsa -P "${{ secrets.EC2_PORT || '22' }}" docker-compose.yml "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${APP_DIR}/"
+          scp -i ~/.ssh/id_rsa -P "${{ secrets.EC2_PORT || '22' }}" backend/.env.docker "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${APP_DIR}/backend/.env.docker"
+          scp -i ~/.ssh/id_rsa -P "${{ secrets.EC2_PORT || '22' }}" nginx/default.conf "${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:${APP_DIR}/nginx/default.conf"
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@master
         env:
+          IMAGE_TAG: ${{ needs.build_and_push.outputs.image_tag }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
           EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           port: ${{ secrets.EC2_PORT || '22' }}
-          envs: EC2_USERNAME
+          envs: IMAGE_TAG,DOCKERHUB_USERNAME,DOCKERHUB_TOKEN,EC2_USERNAME
           script: |
             cd /home/$EC2_USERNAME/wanderlust
-            sudo docker compose -f docker-compose.yml pull || true
-            sudo docker compose -f docker-compose.yml up -d --build
+            docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_TOKEN"
+            export DOCKERHUB_USER="$DOCKERHUB_USERNAME"
+            export IMAGE_TAG="$IMAGE_TAG"
+            docker compose -f docker-compose.yml pull || true
+            docker compose -f docker-compose.yml up -d --no-build
 
   cd_owasp_zap:
     name: DAST - OWASP ZAP Baseline Scan
