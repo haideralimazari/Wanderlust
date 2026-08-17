@@ -1,7 +1,6 @@
 import Post from '../models/post.js';
 import {
   deleteDataFromCache,
-  retrieveDataFromCache,
   storeDataInCache,
 } from '../utils/cache-posts.js';
 import { HTTP_STATUS, REDIS_KEYS, RESPONSE_MESSAGES, validCategories } from '../utils/constants.js';

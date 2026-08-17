@@ -28,7 +28,7 @@ export default function DetailsPage() {
     if (post === undefined) {
       getPostById();
     }
-  }, [post]);
+  }, [post, postId]);
 
   if (!loading)
     return (

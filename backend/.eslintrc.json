@@ -10,8 +10,8 @@
     "es2021": true,
     "node": true
   },
-  "plugins": ["babel", "jest"],
   "rules": {
-    "no-console": "off"
+    "no-console": "off",
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
   }
 }

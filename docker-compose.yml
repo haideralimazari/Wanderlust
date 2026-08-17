@@ -1,20 +1,22 @@
 version: "3.8"
 services:
-  mongodb:
+  mongo:
     container_name: mongo-service
     image: mongo:latest
     volumes:
-      - ./backend/data:/data
+      - ./backend/data:/data/db
     ports:
       - "27017:27017"
 
   backend:
     container_name: backend
     build: ./backend
+    env_file:
+      - ./backend/.env.docker
     ports:
       - "5000:5000"
     depends_on:
-      - mongodb
+      - mongo
       - redis
 
   frontend:
@@ -32,7 +34,7 @@ services:
     expose:
       - 6379
     depends_on:
-      - mongodb
+      - mongo
 
 volumes:
   data:

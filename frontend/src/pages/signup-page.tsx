@@ -8,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-toastify';
 
-function signin() {
+function SignUpPage() {
   const navigate = useNavigate();
 
   const {
@@ -130,4 +130,4 @@ function signin() {
   );
 }
 
-export default signin;
+export default SignUpPage;

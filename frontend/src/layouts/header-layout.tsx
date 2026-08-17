@@ -2,7 +2,7 @@ import ThemeToggle from '@/components/theme-toggle-button';
 import AddIcon from '@/assets/svg/add-icon-white.svg';
 import { useNavigate } from 'react-router-dom';
 import Hero from '@/components/hero';
-function header() {
+function HeaderLayout() {
   const navigate = useNavigate();
 
   return (
@@ -41,4 +41,4 @@ function header() {
   );
 }
 
-export default header;
+export default HeaderLayout;

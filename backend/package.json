@@ -14,8 +14,10 @@
     "nodemon": "^3.0.1"
   },
   "scripts": {
-    "test": "jest --watchAll  --detectOpenHandles --verbose --coverage ",
+    "test": "jest --watchAll --detectOpenHandles --verbose --coverage",
+    "test:ci": "jest --ci --detectOpenHandles --coverage --forceExit --runInBand",
     "start": "nodemon server.js",
+    "start:prod": "node server.js",
     "check": "prettier --check .",
     "format": "prettier --write .",
     "vercel-build": "echo yay"

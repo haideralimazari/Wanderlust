@@ -105,8 +105,9 @@ function AddBlog() {
         } else {
           toast.error('Error: ' + response.data.message);
         }
-      } catch (err: any) {
-        toast.error('Error: ' + err.message);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        toast.error('Error: ' + message);
       }
     }
   };

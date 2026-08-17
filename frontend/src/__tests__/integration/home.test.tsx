@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 const mockedUseNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
-  ...(jest.requireActual('react-router-dom') as Record<string, any>),
+  ...(jest.requireActual('react-router-dom') as Record<string, unknown>),
   useNavigate: () => mockedUseNavigate,
 }));
 
